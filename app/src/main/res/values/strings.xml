@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">找应用</string>
+    <string name="k_2">abc\n2</string>
+    <string name="k_3">def\n3</string>
+    <string name="k_4">ghi\n4</string>
+    <string name="k_5">jkl\n5</string>
+    <string name="k_6">mno\n6</string>
+    <string name="k_7">pqrs\n7</string>
+    <string name="k_8">tuv\n8</string>
+    <string name="k_9">wxyz\n9</string>
+    <string name="k_0">0</string>
+    <string name="k_1">1</string>
+    <string name="k_star">*</string>
+    <string name="k_well">#</string>
+</resources>

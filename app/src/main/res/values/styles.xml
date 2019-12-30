@@ -10,7 +10,7 @@
 
     <style name="Transparent" parent="AppTheme">
         <item name="android:windowNoTitle">true</item>
-        <item name="android:background">@android:color/transparent</item>
+        <item name="android:background">@android:color/white</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
         <item name="android:windowIsTranslucent">true</item>

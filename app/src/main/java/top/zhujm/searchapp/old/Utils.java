@@ -1,51 +1,67 @@
-package top.zhujm.searchapp;
+package top.zhujm.searchapp.old;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import top.zhujm.searchapp.AppInfo;
+
 
 public class Utils {
-    public static List<AppInfo> getAllAppNames(Context context) {
-        List<AppInfo> datas = new ArrayList<>();
+    public static Map<String, List<AppInfo>> getAllApps(Context context) {
+        long startTime = System.currentTimeMillis();
+        Map<String, List<AppInfo>> mapDatas = new HashMap<>();
         PackageManager pm = context.getPackageManager();
-        ////获取到所有安装了的应用程序的信息，包括那些卸载了的，但没有清除数据的应用程序
         List<PackageInfo> list2 = pm.getInstalledPackages(PackageManager.GET_UNINSTALLED_PACKAGES);
-        //PackageManager.GET_SHARED_LIBRARY_FILES==1024
-//        List<PackageInfo> list2=pm.getInstalledPackages(PackageManager.GET_SHARED_LIBRARY_FILES);
-        //PackageManager.GET_META_DATA==128
-//        List<PackageInfo> list2=pm.getInstalledPackages(PackageManager.GET_META_DATA);
-//        List<PackageInfo> list2=pm.getInstalledPackages(0);
-        //List<PackageInfo> list2=pm.getInstalledPackages(-10);
-        //List<PackageInfo> list2=pm.getInstalledPackages(10000);
-        int j = 0;
-
         for (PackageInfo packageInfo : list2) {
-            //得到手机上已经安装的应用的名字,即在AndriodMainfest.xml中的app_name。
+            if ((packageInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0) {
+                //系统应用
+                continue;
+            }
             String appName = packageInfo.applicationInfo.loadLabel(context.getPackageManager()).toString();
-            //得到手机上已经安装的应用的图标,即在AndriodMainfest.xml中的icon。
             Drawable drawable = packageInfo.applicationInfo.loadIcon(context.getPackageManager());
-            //得到应用所在包的名字,即在AndriodMainfest.xml中的package的值。
             String packageName = packageInfo.packageName;
-            Log.e("=======aaa", "应用的名字:" + appName);
-            Log.e("=======bbbb", "应用的包名字:" + packageName);
-
-            j++;
             AppInfo appInfo = new AppInfo();
-            appInfo.setAppName(appName);
+            if (TextUtils.isEmpty(appName)) {
+                continue;
+            }
+            String keys = appInfo.setAppName(appName);
             appInfo.setAppIcon(drawable);
             appInfo.setPkgName(packageName);
-            datas.add(appInfo);
+
+            if (mapDatas.containsKey(keys)) {
+                List<AppInfo> appInfos = mapDatas.get(keys);
+                appInfos.add(appInfo);
+            } else {
+                List<AppInfo> appInfos = new ArrayList<>();
+                appInfos.add(appInfo);
+                mapDatas.put(keys, appInfos);
+            }
         }
-        Log.e("========cccccc", "应用的总个数:" + j);
-        return datas;
+        Log.i("zhujm", "prepare cost:" + (System.currentTimeMillis() - startTime) + "ms");
+        return mapDatas;
+    }
+
+    public static final void openApp(Context context, String pName) {
+        try {
+            Intent intent = context.getPackageManager().getLaunchIntentForPackage(pName);
+            context.startActivity(intent);
+        } catch (Exception e) {
+            Toast.makeText(context, "启动失败，可能已经被卸载", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public AppInfo getAppInfo(Context context, ApplicationInfo app) {
@@ -90,5 +106,9 @@ public class Utils {
             e.printStackTrace();
         }
         return appInfo;
+    }
+
+    public static void search() {
+
     }
 }

@@ -1,5 +1,6 @@
 package top.zhujm.searchapp.old;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -120,7 +121,10 @@ public class Utils {
         return appInfo;
     }
 
-    public static void search() {
-
+    public static void goHome(Activity activity) {
+        Intent home = new Intent(Intent.ACTION_MAIN);
+        home.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        home.addCategory(Intent.CATEGORY_HOME);
+        activity.startActivity(home);
     }
 }

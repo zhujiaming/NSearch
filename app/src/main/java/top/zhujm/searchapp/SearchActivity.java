@@ -14,12 +14,14 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import top.zhujm.searchapp.old.SearchTool;
+import top.zhujm.searchapp.old.Utils;
 
 public class SearchActivity extends AppCompatActivity implements SearchTool.OnResultListener {
     private RecyclerView mListView;
     private AppAdapter mAdapter;
     private HandlerThread mHandlerThread;
     private Handler mSeachHandler;
+    private SearchTool mSeachTool = new SearchTool(this);
 
     static final int MSG_PREPARE_APP = 1;
     static final int MSG_SEARCH_APP = 2;
@@ -30,22 +32,30 @@ public class SearchActivity extends AppCompatActivity implements SearchTool.OnRe
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         setContentView(R.layout.activity_main);
-        mListView = findViewById(R.id.rc_list);
-        initRecyclerView();
+        initViews();
         initSearchTask();
     }
 
-    public void initRecyclerView() {
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    public void initViews() {
+        mListView = findViewById(R.id.rc_list);
+        findViewById(R.id.container).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onKeyClick(R.id.key_star);
+            }
+        });
+
         mAdapter = new AppAdapter();
-        GridLayoutManager layoutManager = new GridLayoutManager(this, 5, GridLayoutManager.VERTICAL, false);
-//        layoutManager.setStackFromEnd(true);//列表再底部开始展示，反转后由上面开始展示
-//        layoutManager.setReverseLayout(true);//列表翻转
+        GridLayoutManager layoutManager = new GridLayoutManager(this, 5, GridLayoutManager.VERTICAL, true);
         mListView.setLayoutManager(layoutManager);
         mListView.setAdapter(mAdapter);
         mListView.setItemAnimator(new DefaultItemAnimator());
     }
-
-    SearchTool mSeachTool = new SearchTool(this);
 
     private void initSearchTask() {
         mHandlerThread = new HandlerThread("search_app_task");
@@ -69,11 +79,11 @@ public class SearchActivity extends AppCompatActivity implements SearchTool.OnRe
         mSeachHandler.sendEmptyMessage(MSG_PREPARE_APP);
     }
 
-    public void onKeyClick(final View view) {
+    public void onKeyClick(int keyId) {
         Message message = Message.obtain();
         message.what = MSG_SEARCH_APP;
 
-        switch (view.getId()) {
+        switch (keyId) {
             case R.id.key_0:
                 message.arg1 = 0;
                 break;
@@ -105,6 +115,8 @@ public class SearchActivity extends AppCompatActivity implements SearchTool.OnRe
                 message.arg1 = 9;
                 break;
             case R.id.key_star:
+                Utils.goHome(this);
+                mSeachTool.reset();
                 return;
             case R.id.key_well:
                 message.what = MSG_ROLLBACK_SEARCH;
@@ -116,6 +128,16 @@ public class SearchActivity extends AppCompatActivity implements SearchTool.OnRe
         mSeachHandler.sendMessage(message);
     }
 
+    public void onKeyClick(final View view) {
+        onKeyClick(view.getId());
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        Utils.goHome(this);
+        mSeachTool.reset();
+    }
 
     @Override
     public void onResult(final List<AppInfo> datas) {

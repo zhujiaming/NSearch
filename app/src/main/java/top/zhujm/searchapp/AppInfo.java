@@ -5,12 +5,14 @@ import android.graphics.drawable.Drawable;
 import com.github.promeg.pinyinhelper.Pinyin;
 
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
 public class AppInfo {
 
     public static final String TAG = "AppInfo";
 
+    public long id;
     public String appName;
     public String pkgName;
     public String pkgPath;
@@ -21,6 +23,7 @@ public class AppInfo {
     public String keysStr = "";
 
     public AppInfo() {
+        id = new Random().nextLong();
     }
 
     public void setPkgName(String pkgName) {

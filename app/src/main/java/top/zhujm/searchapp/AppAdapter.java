@@ -23,6 +23,11 @@ class AppAdapter extends RecyclerView.Adapter<AppAdapter.Vh> {
         notifyDataSetChanged();
     }
 
+    @Override
+    public long getItemId(int position) {
+        return datas.get(position).id;
+    }
+
     @NonNull
     @Override
     public Vh onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -30,7 +35,6 @@ class AppAdapter extends RecyclerView.Adapter<AppAdapter.Vh> {
         Vh appVh = new Vh(itemView);
         return appVh;
     }
-
 
     @Override
     public void onBindViewHolder(@NonNull Vh holder, int position) {
@@ -40,8 +44,8 @@ class AppAdapter extends RecyclerView.Adapter<AppAdapter.Vh> {
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Utils.goHome(((Activity) v.getContext()));
                 Utils.openApp(v.getContext(), appInfo.pkgName);
-                ((Activity) v.getContext()).finish();
             }
         });
     }

@@ -13,7 +13,7 @@
 
         <activity
             android:name=".SearchActivity"
-            android:theme="@style/Transparent"
+            android:theme="@style/TransparentTheme"
             android:windowSoftInputMode="stateHidden|stateAlwaysHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

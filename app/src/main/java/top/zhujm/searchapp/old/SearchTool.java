@@ -37,9 +37,10 @@ public class SearchTool {
 
     public static Map<String, List<AppInfo>> KEYAPPS = new HashMap<>();
 
-    private Map<String, List<AppInfo>> cacheApps = new HashMap<>();
+//    private Map<String, List<AppInfo>> cacheApps = new HashMap<>();
 
     public String perKey = "";
+    int length;
     private OnResultListener listener;
 
     public SearchTool(OnResultListener listener) {
@@ -52,6 +53,8 @@ public class SearchTool {
 
     public void reset() {
         perKey = "";
+        length = 0;
+        listener.onResult(Collections.EMPTY_LIST);
     }
 
     public void rollbackSearch() {
@@ -66,6 +69,9 @@ public class SearchTool {
     }
 
     public void enterToSearch(int key) {
+        if (length == 0 && !TextUtils.isEmpty(perKey)) {
+            return;
+        }
         perKey += key;
         searchByKey();
     }
@@ -94,6 +100,7 @@ public class SearchTool {
 //                }
             }
         }
+        length = datas.size();
         Log.i("zhujm", "searchByKey|" + perKey + "|cost:" + (SystemClock.currentThreadTimeMillis() - start) + "ms");
         listener.onResult(datas);
     }

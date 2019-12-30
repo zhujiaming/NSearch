@@ -1,10 +1,12 @@
 package top.zhujm.searchapp.old;
 
 import android.content.Context;
+import android.os.SystemClock;
+import android.text.TextUtils;
 import android.util.Log;
-import android.util.SparseArray;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -15,34 +17,30 @@ import top.zhujm.searchapp.AppInfo;
 
 public class SearchTool {
 
-    public static final SparseArray<String[]> KEYS = new SparseArray<>();
     private static final String TAG = "SearchTool";
 
-    static {
-        KEYS.append(-2, new String[]{"#"});
-        KEYS.append(-1, new String[]{"*"});
-        KEYS.append(0, new String[]{"0"});
-        KEYS.append(1, new String[]{"1"});
-        KEYS.append(2, new String[]{"2", "A", "B", "C"});
-        KEYS.append(3, new String[]{"3", "D", "E", "F"});
-        KEYS.append(4, new String[]{"4", "G", "H", "I"});
-        KEYS.append(5, new String[]{"5", "J", "K", "L"});
-        KEYS.append(6, new String[]{"6", "M", "N", "O"});
-        KEYS.append(7, new String[]{"7", "P", "Q", "R", "S"});
-        KEYS.append(8, new String[]{"8", "T", "U", "V"});
-        KEYS.append(9, new String[]{"9", "W", "X", "Y", "Z"});
-    }
-
+//    public static final SparseArray<String[]> KEYS = new SparseArray<>();
+//    static {
+//        KEYS.append(-2, new String[]{"#"});
+//        KEYS.append(-1, new String[]{"*"});
+//        KEYS.append(0, new String[]{"0"});
+//        KEYS.append(1, new String[]{"1"});
+//        KEYS.append(2, new String[]{"2", "A", "B", "C"});
+//        KEYS.append(3, new String[]{"3", "D", "E", "F"});
+//        KEYS.append(4, new String[]{"4", "G", "H", "I"});
+//        KEYS.append(5, new String[]{"5", "J", "K", "L"});
+//        KEYS.append(6, new String[]{"6", "M", "N", "O"});
+//        KEYS.append(7, new String[]{"7", "P", "Q", "R", "S"});
+//        KEYS.append(8, new String[]{"8", "T", "U", "V"});
+//        KEYS.append(9, new String[]{"9", "W", "X", "Y", "Z"});
+//    }
 
     public static Map<String, List<AppInfo>> KEYAPPS = new HashMap<>();
 
-    public List<AppInfo> APPS;
+    private Map<String, List<AppInfo>> cacheApps = new HashMap<>();
 
-//    private Set<Integer> perKeys = new HashSet<>();
-
-
-    private String perKey = "";
-    OnResultListener listener;
+    public String perKey = "";
+    private OnResultListener listener;
 
     public SearchTool(OnResultListener listener) {
         this.listener = listener;
@@ -50,29 +48,54 @@ public class SearchTool {
 
     public void prepareApps(Context context) {
         KEYAPPS = Utils.getAllApps(context);
-        Log.i(TAG, "KEY_APPS==>" + KEYAPPS.toString());
     }
 
     public void reset() {
-//        perKeys.clear();
-        perKey = null;
+        perKey = "";
     }
 
-    public List<AppInfo> searchByKey(int key) {
-        List<AppInfo> datas = new ArrayList<>();
+    public void rollbackSearch() {
+        if (!TextUtils.isEmpty(perKey)) {
+            perKey = perKey.substring(0, perKey.length() - 1);
+            if (TextUtils.isEmpty(perKey)) {
+                listener.onResult(Collections.<AppInfo>emptyList());
+            } else {
+                searchByKey();
+            }
+        }
+    }
+
+    public void enterToSearch(int key) {
         perKey += key;
+        searchByKey();
+    }
+
+    public void searchByKey() {
+        long start = SystemClock.currentThreadTimeMillis();
+        List<AppInfo> datas = new ArrayList<>();
         Log.i(TAG, "searchByKey|" + perKey);
-        Set<Map.Entry<String, List<AppInfo>>> entries = KEYAPPS.entrySet();
+        Map<String, List<AppInfo>> tempAppList = KEYAPPS;
+//        if (cacheApps.size() > 0) {
+//            tempAppList = new HashMap<>();
+//            tempAppList.putAll(cacheApps);
+//        }
+        Set<Map.Entry<String, List<AppInfo>>> entries = tempAppList.entrySet();
         Iterator<Map.Entry<String, List<AppInfo>>> iterator = entries.iterator();
         while (iterator.hasNext()) {
             Map.Entry<String, List<AppInfo>> next = iterator.next();
-            if (next.getKey().startsWith(perKey)) {
-                datas.addAll(next.getValue());
+            String key = next.getKey();
+            List<AppInfo> appInfos = next.getValue();
+            if (key.startsWith(perKey)) {
+                datas.addAll(appInfos);
+//                if (cacheApps.containsKey(key)) {
+//                    cacheApps.get(key).addAll(appInfos);
+//                }else{
+//                    cacheApps.put(key, appInfos);
+//                }
             }
         }
-
+        Log.i("zhujm", "searchByKey|" + perKey + "|cost:" + (SystemClock.currentThreadTimeMillis() - start) + "ms");
         listener.onResult(datas);
-        return datas;
     }
 
     public interface OnResultListener {

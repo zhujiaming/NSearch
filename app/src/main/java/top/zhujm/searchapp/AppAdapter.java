@@ -1,7 +1,6 @@
 package top.zhujm.searchapp;
 
 import android.app.Activity;
-import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,11 +35,7 @@ class AppAdapter extends RecyclerView.Adapter<AppAdapter.Vh> {
     @Override
     public void onBindViewHolder(@NonNull Vh holder, int position) {
         final AppInfo appInfo = this.datas.get(position);
-        Drawable iconDraw = appInfo.appIcon;
-        if (iconDraw == null) {
-            iconDraw = holder.itemView.getContext().getDrawable(R.mipmap.ic_launcher);
-        }
-        holder.ivIcon.setImageDrawable(iconDraw);
+        holder.ivIcon.setImageDrawable(Utils.getIconByPackageName(holder.itemView.getContext(), appInfo.pkgName));
         holder.tvName.setText(appInfo.appName);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

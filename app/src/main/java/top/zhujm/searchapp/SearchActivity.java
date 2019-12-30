@@ -21,6 +21,10 @@ public class SearchActivity extends AppCompatActivity implements SearchTool.OnRe
     private HandlerThread mHandlerThread;
     private Handler mSeachHandler;
 
+    static final int MSG_PREPARE_APP = 1;
+    static final int MSG_SEARCH_APP = 2;
+    static final int MSG_ROLLBACK_SEARCH = 3;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,59 +54,65 @@ public class SearchActivity extends AppCompatActivity implements SearchTool.OnRe
             @Override
             public void handleMessage(Message msg) {
                 switch (msg.what) {
-                    case 1:
+                    case MSG_PREPARE_APP:
                         mSeachTool.prepareApps(SearchActivity.this);
                         break;
-                    case 2:
-                        mSeachTool.searchByKey(msg.arg1);
+                    case MSG_SEARCH_APP:
+                        mSeachTool.enterToSearch(msg.arg1);
+                        break;
+                    case MSG_ROLLBACK_SEARCH:
+                        mSeachTool.rollbackSearch();
                         break;
                 }
             }
         };
-        mSeachHandler.sendEmptyMessage(1);
+        mSeachHandler.sendEmptyMessage(MSG_PREPARE_APP);
     }
 
     public void onKeyClick(final View view) {
-        int keyNumber = -999;
+        Message message = Message.obtain();
+        message.what = MSG_SEARCH_APP;
+
         switch (view.getId()) {
             case R.id.key_0:
-                keyNumber = 0;
+                message.arg1 = 0;
                 break;
             case R.id.key_1:
-                keyNumber = 1;
+                message.arg1 = 1;
                 break;
             case R.id.key_2:
-                keyNumber = 2;
+                message.arg1 = 2;
                 break;
             case R.id.key_3:
-                keyNumber = 3;
+                message.arg1 = 3;
                 break;
             case R.id.key_4:
-                keyNumber = 4;
+                message.arg1 = 4;
                 break;
             case R.id.key_5:
-                keyNumber = 5;
+                message.arg1 = 5;
                 break;
             case R.id.key_6:
-                keyNumber = 6;
+                message.arg1 = 6;
                 break;
             case R.id.key_7:
-                keyNumber = 7;
+                message.arg1 = 7;
                 break;
             case R.id.key_8:
-                keyNumber = 8;
+                message.arg1 = 8;
                 break;
             case R.id.key_9:
-                keyNumber = 9;
+                message.arg1 = 9;
                 break;
             case R.id.key_star:
-                break;
+                return;
             case R.id.key_well:
-                break;
+                message.what = MSG_ROLLBACK_SEARCH;
+                mSeachHandler.sendMessage(message);
+                return;
+            default:
+                return;
         }
-        Message message = Message.obtain();
-        message.what = 2;
-        message.arg1 = keyNumber;
         mSeachHandler.sendMessage(message);
     }
 

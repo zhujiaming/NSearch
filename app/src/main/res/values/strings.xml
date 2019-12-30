@@ -10,6 +10,6 @@
     <string name="k_9">wxyz\n9</string>
     <string name="k_0">0</string>
     <string name="k_1">1</string>
-    <string name="k_star">*</string>
-    <string name="k_well">#</string>
+    <string name="k_star"></string>
+    <string name="k_well">⬅</string>
 </resources>

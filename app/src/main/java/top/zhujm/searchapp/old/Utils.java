@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import top.zhujm.searchapp.AppInfo;
+import top.zhujm.searchapp.R;
 
 
 public class Utils {
@@ -50,9 +51,20 @@ public class Utils {
                 appInfos.add(appInfo);
                 mapDatas.put(keys, appInfos);
             }
+//            appInfo.insert();
         }
         Log.i("zhujm", "prepare cost:" + (System.currentTimeMillis() - startTime) + "ms");
         return mapDatas;
+    }
+
+    public static Drawable getIconByPackageName(Context context, String pname) {
+        try {
+            Drawable drawable = context.getPackageManager().getPackageInfo(pname, PackageManager.MATCH_UNINSTALLED_PACKAGES).applicationInfo.loadIcon(context.getPackageManager());
+            return drawable;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return context.getDrawable(R.mipmap.ic_launcher);
     }
 
     public static final void openApp(Context context, String pName) {

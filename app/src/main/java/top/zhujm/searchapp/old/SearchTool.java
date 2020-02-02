@@ -76,7 +76,7 @@ public class SearchTool {
         searchByKey();
     }
 
-    public void searchByKey() {
+    private void searchByKey() {
         long start = SystemClock.currentThreadTimeMillis();
         List<AppInfo> datas = new ArrayList<>();
         Log.i(TAG, "searchByKey|" + perKey);
